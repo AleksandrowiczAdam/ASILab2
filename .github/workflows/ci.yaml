@@ -41,6 +41,6 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-      - name: Print log.txt
+      - name: Print Report
         run: |
-          cat log.txt
+          cat report.txt
