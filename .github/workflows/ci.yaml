@@ -30,6 +30,14 @@ jobs:
       - name: Install Requirements
         run: |
           pip install -r requirements.txt
+          pip install gspread oauth2client
 
       - name: Run Python Script to Generate Dataset
-        run: python generator_danych.py
+        run: python generator_danych.py -s 24732
+        
+      - name: Push Data to Google Sheet
+        run: |
+          python push_to_google_sheet.py
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
