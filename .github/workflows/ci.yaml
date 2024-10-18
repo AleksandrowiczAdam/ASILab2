@@ -1,0 +1,35 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Current Repository
+        uses: actions/checkout@v2
+
+      - name: Checkout Other Repository
+        run: |
+          git clone https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/PJATK-ASI-2024/Lab2---Obr-bka-danych.git temp_repo
+
+      - name: Get Python Files
+        run: |
+          cp temp_repo/generator_danych.py ./
+          cp temp_repo/requirements.txt ./
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install Requirements
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Python Script to Generate Dataset
+        run: python generator_danych.py
