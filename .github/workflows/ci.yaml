@@ -41,3 +41,6 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
+      - name: Print log.txt
+        run: |
+          cat log.txt

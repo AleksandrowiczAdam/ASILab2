@@ -3,6 +3,14 @@ import pandas as pd
 import json
 from oauth2client.service_account import ServiceAccountCredentials
 import os
+import logging
+
+# Set up logging
+logging.basicConfig(
+    filename='log.txt',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 def normalize(series):
     return (series - series.min()) / (series.max() - series.min())
@@ -16,23 +24,34 @@ def replace_education(education):
     return mapping.get(education, -1)  # Default to -1 if unknown
 
 def clean_data(df):
+    logging.info("Data cleaning started.")
+    
     # Clean Age column
     median_age = df['Wiek'].median()
+    age_before = df['Wiek'].isnull().sum()
     df['Wiek'].fillna(median_age, inplace=True)
+    age_after = df['Wiek'].isnull().sum()
+    logging.info(f"Filled {100 * (age_before - age_after) / age_before:.2f}% of missing Age values.")
 
     # Clean Average Salary column
     median_salary = df['Średnie Zarobki'].median()
+    salary_before = df['Średnie Zarobki'].isnull().sum()
     df['Średnie Zarobki'].fillna(median_salary, inplace=True)
+    salary_after = df['Średnie Zarobki'].isnull().sum()
+    logging.info(f"Filled {100 * (salary_before - salary_after) / salary_before:.2f}% of missing Average Salary values.")
 
     # Discard rows with any remaining missing data
+    rows_before = df.shape[0]
     df.dropna(inplace=True)
+    rows_after = df.shape[0]
+    discarded_rows = rows_before - rows_after
+    logging.info(f"Discarded {discarded_rows} rows due to missing data.")
 
     # Normalize Age and Average Salary
     df['Wiek'] = normalize(df['Wiek'])
     df['Średnie Zarobki'] = normalize(df['Średnie Zarobki'])
 
     # Normalize Trip Start and End Time
-    # Convert time strings to minutes for normalization
     def time_to_minutes(time_str):
         if isinstance(time_str, str) and ':' in time_str:
             hours, minutes = map(int, time_str.split(':'))
@@ -48,8 +67,8 @@ def clean_data(df):
     # Replace Education strings with numeric values
     df['Wykształcenie'] = df['Wykształcenie'].apply(replace_education)
 
+    logging.info("Data cleaning completed.")
     return df
-
 
 # Load Google Sheets credentials from JSON stored in environment variable
 def load_credentials():
