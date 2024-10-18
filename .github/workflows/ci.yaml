@@ -37,7 +37,7 @@ jobs:
         
       - name: Push Data to Google Sheet
         run: |
-          python push_to_google_sheet.py
+          python load_clean_upload.py
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
